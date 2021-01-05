@@ -12,17 +12,14 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            artifact_name: dist/main
+            artifact_name: dist/main.zip
             asset_name: main-linux-amd64
-            suffix: 
           - os: windows-latest
-            artifact_name: dist/main.exe
+            artifact_name: dist/main.zip
             asset_name: main-windows-amd64
-            suffix: .exe
           - os: macos-latest
-            artifact_name: dist/main
+            artifact_name: dist/main.zip
             asset_name: main-macos-amd64
-            suffix: 
         
     steps:
     - uses: actions/checkout@v2
@@ -34,7 +31,7 @@ jobs:
       run: |
           echo ${{matrix.artifact_name}}
           echo ${{matrix.os}}
-          echo ${{matrix.asset_name}}-${{env.GITHUB_REF_SLUG}}${{matrix.suffix}}
+          echo ${{matrix.asset_name}}-${{env.GITHUB_REF_SLUG}}.zip
     - name: get dependencies
       run: |
           pip install readchar
@@ -45,18 +42,18 @@ jobs:
           cd ..
           python setup.py install
           cd ..
-          python -m PyInstaller main.py --onefile --hidden-import readchar
+          python -m PyInstaller main.py --hidden-import readchar
     - name: Create Archive
       uses: papeloto/action-zip@v1
       with:
           dest: ${{matrix.artifact_name}}
-          files: dist/
+          files: dist/main/
     - name: Upload file
       uses: svenstaro/upload-release-action@v2
       with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ${{matrix.artifact_name}}
-          asset_name: ${{format('{0}-{1}{2}',matrix.asset_name,env.GITHUB_REF_SLUG,matrix.suffix)}}
+          asset_name: ${{format('{0}-{1}.zip',matrix.asset_name,env.GITHUB_REF_SLUG)}}
           tag: ${{github.ref}}
           overwrite: true
           body: "Release of simple pyInstaller binary, version ${{env.GITHUB_REF_SLUG}}"
