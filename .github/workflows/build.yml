@@ -42,12 +42,12 @@ jobs:
           cd ..
           python setup.py install
           cd ..
-          python -m PyInstaller main.py --hidden-import readchar
+          python -m PyInstaller main.py --onefile --hidden-import readchar
     - name: Create Archive
       uses: papeloto/action-zip@v1
       with:
           dest: ${{matrix.artifact_name}}
-          files: dist/main/
+          files: dist/
     - name: Upload file
       uses: svenstaro/upload-release-action@v2
       with:
