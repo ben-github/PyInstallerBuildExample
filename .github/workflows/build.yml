@@ -12,14 +12,17 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            artifact_name: dist/main.zip
+            artifact_name: dist/main
             asset_name: main-linux-amd64
+            suffix: 
           - os: windows-latest
-            artifact_name: dist/main.zip
+            artifact_name: dist/main.exe
             asset_name: main-windows-amd64
+            suffix: .exe
           - os: macos-latest
-            artifact_name: dist/main.zip
+            artifact_name: dist/main
             asset_name: main-macos-amd64
+            suffix: 
         
     steps:
     - uses: actions/checkout@v2
@@ -31,7 +34,7 @@ jobs:
       run: |
           echo ${{matrix.artifact_name}}
           echo ${{matrix.os}}
-          echo ${{matrix.asset_name}}-${{env.GITHUB_REF_SLUG}}.zip
+          echo ${{matrix.asset_name}}-${{env.GITHUB_REF_SLUG}}${{matrix.suffix}}
     - name: get dependencies
       run: |
           pip install readchar
@@ -53,7 +56,7 @@ jobs:
       with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ${{matrix.artifact_name}}
-          asset_name: ${{format('{0}-{1}.zip',matrix.asset_name,env.GITHUB_REF_SLUG)}}
+          asset_name: ${{format('{0}-{1}{2}',matrix.asset_name,env.GITHUB_REF_SLUG,matrix.suffix)}}
           tag: ${{github.ref}}
           overwrite: true
           body: "Release of simple pyInstaller binary, version ${{env.GITHUB_REF_SLUG}}"
